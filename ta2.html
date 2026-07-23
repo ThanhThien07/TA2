@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Ôn Thi Trắc Nghiệm Tiếng Anh 2 (TA2)</title>
+  
+  <!-- Google Fonts: Inter and Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Reset & CSS variables */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #0d1224, #070913);
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --card-border: rgba(124, 58, 237, 0.15);
+      --card-border-hover: rgba(139, 92, 246, 0.4);
+      --primary: #7c3aed;
+      --primary-glow: rgba(124, 58, 237, 0.35);
+      --secondary: #ec4899;
+      --accent-blue: #3b82f6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --correct: #10b981;
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: rgba(16, 185, 129, 0.4);
+      
+      --incorrect: #ef4444;
+      --incorrect-bg: rgba(239, 68, 68, 0.15);
+      --incorrect-border: rgba(239, 68, 68, 0.4);
+      
+      --unanswered: #4b5563;
+      --glass-filter: blur(16px);
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(10, 15, 30, 0.85);
+      backdrop-filter: var(--glass-filter);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand i {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 12px var(--primary-glow));
+    }
+
+    .brand h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, #a78bfa, var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .subject-switch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .subject-switch-btn:hover {
+      background: rgba(124, 58, 237, 0.2);
+      border-color: rgba(124, 58, 237, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Main layout container */
+    .container {
+      display: flex;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 1.5rem 2rem;
+      gap: 2rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Left pane */
+    .left-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 1000px;
+    }
+
+    /* Right pane */
+    .right-pane {
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: sticky;
+      top: 5.5rem;
+      height: calc(100vh - 7rem);
+    }
+
+    /* Panel styling */
+    .panel {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-filter);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: all 0.3s ease;
+    }
+
+    .panel:hover {
+      border-color: rgba(124, 58, 237, 0.25);
+    }
+
+    /* Stats Panel */
+    .stats-header {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      padding: 0.6rem;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .stat-val.correct { color: var(--correct); }
+    .stat-val.incorrect { color: var(--incorrect); }
+    .stat-val.progress { color: #3b82f6; }
+
+    .stat-lbl {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Progress bar */
+    .progress-bar-container {
+      background: rgba(255, 255, 255, 0.05);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0.75rem 0;
+      position: relative;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Action Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 0.75rem;
+      padding: 0.7rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 14px 0 var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px 0 rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    /* Grid layout */
+    .grid-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+      padding-right: 0.25rem;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(124, 58, 237, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(124, 58, 237, 0.6);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.35rem;
+    }
+
+    .grid-btn {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: var(--primary);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .grid-btn.correct {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+      color: var(--correct);
+    }
+
+    .grid-btn.incorrect {
+      background: var(--incorrect-bg);
+      border-color: var(--incorrect-border);
+      color: var(--incorrect);
+    }
+
+    .grid-btn.answered {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+    }
+
+    .grid-btn.active {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1px;
+    }
+
+    /* Filters section */
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .filter-btn {
+      padding: 0.45rem 0.85rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Search Bar */
+    .search-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 0.7rem 1rem 0.7rem 2.5rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    /* Settings section */
+    .settings-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .mode-toggle {
+      flex: 1;
+      display: flex;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.25rem;
+      border-radius: 0.75rem;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.45rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+    }
+
+    /* Question Card */
+    .question-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding-bottom: 10rem;
+    }
+
+    .card {
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .q-number {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #c084fc;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .unit-badge {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .q-status-badge {
+      font-size: 0.72rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .q-status-badge.correct {
+      background: var(--correct-bg);
+      color: var(--correct);
+      border: 1px solid var(--correct-border);
+    }
+
+    .q-status-badge.incorrect {
+      background: var(--incorrect-bg);
+      color: var(--incorrect);
+      border: 1px solid var(--incorrect-border);
+    }
+
+    .q-status-badge.unanswered {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .q-text {
+      font-size: 1.02rem;
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+      white-space: pre-line;
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option:hover:not(.disabled) {
+      background: rgba(124, 58, 237, 0.08);
+      border-color: rgba(124, 58, 237, 0.25);
+      transform: translateX(4px);
+    }
+
+    .option-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .option-text {
+      font-size: 0.92rem;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    /* Option States */
+    .option.selected {
+      background: rgba(124, 58, 237, 0.15);
+      border-color: rgba(124, 58, 237, 0.4);
+    }
+
+    .option.selected .option-letter {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .option.correct-choice {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+    }
+
+    .option.correct-choice .option-letter {
+      background: var(--correct) !important;
+      border-color: var(--correct) !important;
+      color: #fff !important;
+    }
+
+    .option.incorrect-choice {
+      background: var(--incorrect-bg) !important;
+      border-color: var(--incorrect-border) !important;
+    }
+
+    .option.incorrect-choice .option-letter {
+      background: var(--incorrect) !important;
+      border-color: var(--incorrect) !important;
+      color: #fff !important;
+    }
+
+    .option.disabled {
+      cursor: default;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--primary);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Mobile panel trigger */
+    .mobile-stats-trigger {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 20px var(--primary-glow);
+      z-index: 99;
+      cursor: pointer;
+    }
+
+    /* Empty state */
+    .no-results {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .container {
+        padding: 1rem;
+      }
+      .right-pane {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 320px;
+        height: 100vh;
+        z-index: 200;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        border-radius: 0;
+      }
+
+      .right-pane.show {
+        transform: translateX(0);
+      }
+
+      .mobile-stats-trigger {
+        display: flex;
+      }
+
+      .close-panel-btn {
+        display: block !important;
+      }
+    }
+
+    .close-panel-btn {
+      display: none;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    /* Animations */
+    .shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <div>
+        <h1>Ôn Thi <span>Tiếng Anh 2 (TA2)</span></h1>
+        <div class="brand-subtitle">Revision Unit 6 • Unit 7 • Unit 8 • Unit 9 (153 Câu)</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a href="index.html" class="subject-switch-btn" title="Chuyển sang môn Giáo Dục Chính Trị">
+        <i class="fa-solid fa-book-open"></i> Môn GDCT K26
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Left Pane: Controls & Questions -->
+    <div class="left-pane">
+      
+      <!-- Panel 1: Mode Switcher & Filters -->
+      <div class="panel">
+        <div class="settings-row">
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="mode-practice" onclick="setMode('practice')">
+              <i class="fa-solid fa-bolt"></i> Chế độ Ôn tập
+            </button>
+            <button class="mode-btn" id="mode-exam" onclick="setMode('exam')">
+              <i class="fa-solid fa-pen-to-square"></i> Chế độ Thi thử
+            </button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container" style="margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm nội dung câu hỏi hoặc đáp án..." oninput="handleSearch()">
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="filters-bar" id="filters-container">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tất cả (153)</button>
+          <button class="filter-btn" data-filter="unit6" onclick="setFilter('unit6')">Unit 6 (30)</button>
+          <button class="filter-btn" data-filter="unit7" onclick="setFilter('unit7')">Unit 7 (39)</button>
+          <button class="filter-btn" data-filter="unit8" onclick="setFilter('unit8')">Unit 8 (32)</button>
+          <button class="filter-btn" data-filter="unit9" onclick="setFilter('unit9')">Unit 9 (52)</button>
+          <button class="filter-btn" data-filter="undone" onclick="setFilter('undone')">Chưa làm (<span id="count-undone">153</span>)</button>
+          <button class="filter-btn" data-filter="done" onclick="setFilter('done')">Đã làm (<span id="count-done">0</span>)</button>
+          <button class="filter-btn" data-filter="correct" onclick="setFilter('correct')">Đúng (<span id="count-correct">0</span>)</button>
+          <button class="filter-btn" data-filter="incorrect" onclick="setFilter('incorrect')">Sai (<span id="count-incorrect">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <div class="question-list" id="questions-container">
+        <!-- Rendered dynamically -->
+      </div>
+
+    </div>
+
+    <!-- Right Pane: Statistics & Grid Navigator -->
+    <div class="right-pane panel" id="right-panel">
+      <button class="close-panel-btn" onclick="toggleMobilePanel()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div>
+        <div class="stats-header">
+          <span>Tiến Độ Học Tập</span>
+          <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);" id="percent-label">0%</span>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-val progress" id="stat-done">0/153</div>
+            <div class="stat-lbl">Đã trả lời</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-score">0%</div>
+            <div class="stat-lbl">Tỷ lệ đúng</div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box" style="border-color: rgba(16, 185, 129, 0.2);">
+            <div class="stat-val correct" id="stat-correct">0</div>
+            <div class="stat-lbl">Câu đúng</div>
+          </div>
+          <div class="stat-box" style="border-color: rgba(239, 68, 68, 0.2);">
+            <div class="stat-val incorrect" id="stat-incorrect">0</div>
+            <div class="stat-lbl">Câu sai</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 0.75rem;">
+        <button id="submit-btn" class="btn btn-primary" style="display: none;" onclick="submitExam()">
+          <i class="fa-solid fa-paper-plane"></i> Nộp Bài Chấm Điểm
+        </button>
+        <button class="btn btn-secondary" onclick="shuffleAnswersAll()">
+          <i class="fa-solid fa-shuffle"></i> Tráo Lại Đáp Án
+        </button>
+        <button class="btn btn-danger" onclick="resetProgressConfirm()">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Đặt Lại Tiến Độ
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.4rem; text-transform: uppercase;">
+          <i class="fa-solid fa-list-ol"></i> Bảng dò câu hỏi nhanh (1-153)
+        </div>
+        <div class="grid-container">
+          <div class="grid" id="navigation-grid">
+            <!-- Grid buttons rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Mobile Floating Trigger -->
+  <div class="mobile-stats-trigger" onclick="toggleMobilePanel()">
+    <i class="fa-solid fa-chart-simple"></i>
+  </div>
+
+  <div class="toast" id="toast">Lưu tiến độ tự động thành công!</div>
+
+  <script>
+    // Embedded 153 questions from REVIEW TA2.pdf
+    const ORIGINAL_QUESTIONS = [
+      // Unit 6 (30 questions)
+      {"id": 1, "unit": "Unit 6", "unit_question_num": 1, "question": "I ………… an awful film on TV last night.", "options": {"A": "watch", "B": "watches", "C": "am watching", "D": "watched"}, "answer": "D"},
+      {"id": 2, "unit": "Unit 6", "unit_question_num": 2, "question": "She ………… to get closer to the monkeys in the zoo.", "options": {"A": "wanted", "B": "studied", "C": "saw", "D": "ate"}, "answer": "A"},
+      {"id": 3, "unit": "Unit 6", "unit_question_num": 3, "question": "My brother ………… biology at university.", "options": {"A": "watched", "B": "stopped", "C": "studied", "D": "travelled"}, "answer": "C"},
+      {"id": 4, "unit": "Unit 6", "unit_question_num": 4, "question": "The rain ………… after lunch.", "options": {"A": "stopped", "B": "caused", "C": "lived", "D": "waited"}, "answer": "A"},
+      {"id": 5, "unit": "Unit 6", "unit_question_num": 5, "question": "………… look most similar to humans.", "options": {"A": "Bears", "B": "Whales", "C": "Gorillas", "D": "Bees"}, "answer": "C"},
+      {"id": 6, "unit": "Unit 6", "unit_question_num": 6, "question": "………… have the longest necks.", "options": {"A": "Wolves", "B": "Giraffes", "C": "Dolphins", "D": "Spiders"}, "answer": "B"},
+      {"id": 7, "unit": "Unit 6", "unit_question_num": 7, "question": "………… are the only insects that make food humans can eat.", "options": {"A": "Bees", "B": "Butterflies", "C": "Spiders", "D": "Snakes"}, "answer": "A"},
+      {"id": 8, "unit": "Unit 6", "unit_question_num": 8, "question": "It isn’t unusual to swim with ………… on holiday.", "options": {"A": "sharks", "B": "whales", "C": "dolphins", "D": "crocodiles"}, "answer": "C"},
+      {"id": 9, "unit": "Unit 6", "unit_question_num": 9, "question": "Some ………… are longer than a school bus!", "options": {"A": "spiders", "B": "frogs", "C": "snakes", "D": "monkeys"}, "answer": "C"},
+      {"id": 10, "unit": "Unit 6", "unit_question_num": 10, "question": "An eagle’s ………… can be as wide as two metres.", "options": {"A": "foot", "B": "wing", "C": "paw", "D": "eyes"}, "answer": "B"},
+      {"id": 11, "unit": "Unit 6", "unit_question_num": 11, "question": "Monkeys use their ………… to hold onto trees.", "options": {"A": "ears", "B": "eyes", "C": "foot", "D": "tails"}, "answer": "D"},
+      {"id": 12, "unit": "Unit 6", "unit_question_num": 12, "question": "Crocodiles have between 60 and 72 ………… .", "options": {"A": "teeth", "B": "feet", "C": "eyes", "D": "ears"}, "answer": "A"},
+      {"id": 13, "unit": "Unit 6", "unit_question_num": 13, "question": "We ………… a taxi from the airport with another couple.", "options": {"A": "visited", "B": "shared", "C": "chatted", "D": "returned"}, "answer": "B"},
+      {"id": 14, "unit": "Unit 6", "unit_question_num": 14, "question": "She ………… an explorer from Egypt.", "options": {"A": "chatted", "B": "married", "C": "shared", "D": "returned"}, "answer": "B"},
+      {"id": 15, "unit": "Unit 6", "unit_question_num": 15, "question": "I phoned you ………… .", "options": {"A": "ago two hours", "B": "two ago hours", "C": "hours two ago", "D": "two hours ago"}, "answer": "D"},
+      {"id": 16, "unit": "Unit 6", "unit_question_num": 16, "question": "Look at the beautiful wings on that ………… .", "options": {"A": "tiger", "B": "butterfly", "C": "hippo", "D": "bear"}, "answer": "B"},
+      {"id": 17, "unit": "Unit 6", "unit_question_num": 17, "question": "A small orange ………… jumped in front of me.", "options": {"A": "monkey", "B": "dolphin", "C": "spider", "D": "shark"}, "answer": "A"},
+      {"id": 18, "unit": "Unit 6", "unit_question_num": 18, "question": "Spiders have eight ………… .", "options": {"A": "tails", "B": "legs", "C": "ears", "D": "eyes"}, "answer": "B"},
+      {"id": 19, "unit": "Unit 6", "unit_question_num": 19, "question": "Bears walk on their four ………… and only stand sometimes.", "options": {"A": "tails", "B": "eyes", "C": "ears", "D": "paws"}, "answer": "D"},
+      {"id": 20, "unit": "Unit 6", "unit_question_num": 20, "question": "Help! There’s a ………… in the bath! Use that cup to get it out.", "options": {"A": "crocodile", "B": "shark", "C": "gorilla", "D": "spider"}, "answer": "D"},
+      {"id": 21, "unit": "Unit 6", "unit_question_num": 21, "question": "She………… at film club last weekend.", "options": {"A": "wasn’t", "B": "weren’t", "C": "could", "D": "couldn’t"}, "answer": "A"},
+      {"id": 22, "unit": "Unit 6", "unit_question_num": 22, "question": "Watch out! There’s a bike coming straight ………… you.", "options": {"A": "over", "B": "through", "C": "towards", "D": "out of"}, "answer": "C"},
+      {"id": 23, "unit": "Unit 6", "unit_question_num": 23, "question": "I want to fly………… London at night and see the lights.", "options": {"A": "over", "B": "through", "C": "towards", "D": "out of"}, "answer": "A"},
+      {"id": 24, "unit": "Unit 6", "unit_question_num": 24, "question": "She’s a ………… for an online magazine.", "options": {"A": "soldier", "B": "journalist", "C": "scientist", "D": "pilot"}, "answer": "B"},
+      {"id": 25, "unit": "Unit 6", "unit_question_num": 25, "question": "You have to be good at biology, physics and chemistry if you want to be a…………", "options": {"A": "soldier", "B": "pilot", "C": "scientist", "D": "waiter"}, "answer": "C"},
+      {"id": 26, "unit": "Unit 6", "unit_question_num": 26, "question": "We live in a town near the sea, and most of the men work as…………", "options": {"A": "waiter", "B": "soldier", "C": "pilot", "D": "fishermen"}, "answer": "D"},
+      {"id": 27, "unit": "Unit 6", "unit_question_num": 27, "question": "There’s a busy road outside our house and cars drive………… all night.", "options": {"A": "into", "B": "along", "C": "away from", "D": "past"}, "answer": "D"},
+      {"id": 28, "unit": "Unit 6", "unit_question_num": 28, "question": "My sister is an excellent………… she raced her yacht in the 2012 Olympics.", "options": {"A": "sailor", "B": "explorer", "C": "journalist", "D": "waitress"}, "answer": "A"},
+      {"id": 29, "unit": "Unit 6", "unit_question_num": 29, "question": "The animals are scared – they’re running………… that tiger.", "options": {"A": "out of", "B": "away from", "C": "towards", "D": "through"}, "answer": "B"},
+      {"id": 30, "unit": "Unit 6", "unit_question_num": 30, "question": "Two days ago, I ………… to see a doctor to check my back.", "options": {"A": "visited", "B": "watched", "C": "went", "D": "thoughts"}, "answer": "C"},//  (39 questions)
+      {"id": 31, "unit": "Unit 7", "unit_question_num": 1, "question": "The Wright brother………… the first plane in 1905", "options": {"A": "built", "B": "build", "C": "building", "D": "builds"}, "answer": "A"},
+      {"id": 32, "unit": "Unit 7", "unit_question_num": 2, "question": "My uncle………… me how to ride a bike when I was 5.", "options": {"A": "teaches", "B": "teaching", "C": "taught", "D": "teach"}, "answer": "C"},
+      {"id": 33, "unit": "Unit 7", "unit_question_num": 3, "question": "Yesterday morning, I ………… a wallet on the train.", "options": {"A": "bought", "B": "found", "C": "began", "D": "did"}, "answer": "B"},
+      {"id": 34, "unit": "Unit 7", "unit_question_num": 4, "question": "Last weekend my cousin Lewis………… to stay with us.", "options": {"A": "took", "B": "spent", "C": "saw", "D": "came"}, "answer": "D"},
+      {"id": 35, "unit": "Unit 7", "unit_question_num": 5, "question": "When I was in London, I ………… Buckingham Palace and the usual famous places.", "options": {"A": "came", "B": "saw", "C": "bought", "D": "took"}, "answer": "B"},
+      {"id": 36, "unit": "Unit 7", "unit_question_num": 6, "question": "Turn on your ………… so that I can see you.", "options": {"A": "headphones", "B": "mouse", "C": "webcam", "D": "printer"}, "answer": "C"},
+      {"id": 37, "unit": "Unit 7", "unit_question_num": 7, "question": "I can’t find my………… and all of my homework is on it!", "options": {"A": "memory stick", "B": "speaker", "C": "keyboard", "D": "mouse"}, "answer": "A"},
+      {"id": 38, "unit": "Unit 7", "unit_question_num": 8, "question": "Use your………… to right-click on the image.", "options": {"A": "speaker", "B": "tablet", "C": "keyboard", "D": "mouse"}, "answer": "D"},
+      {"id": 39, "unit": "Unit 7", "unit_question_num": 9, "question": "That’s a terrible photo of me! Please………… it!", "options": {"A": "delete", "B": "download", "C": "upload", "D": "print"}, "answer": "A"},
+      {"id": 40, "unit": "Unit 7", "unit_question_num": 10, "question": "Do you want to………… in colous or black and white?", "options": {"A": "post", "B": "print", "C": "enter", "D": "download"}, "answer": "B"},
+      {"id": 41, "unit": "Unit 7", "unit_question_num": 11, "question": "You have to ………… the password to get Wi-fi in the coffee shop.", "options": {"A": "download", "B": "upload", "C": "delete", "D": "enter"}, "answer": "D"},
+      {"id": 42, "unit": "Unit 7", "unit_question_num": 12, "question": "Please don’t ………… a comment of my Facebook page.", "options": {"A": "post", "B": "enter", "C": "print", "D": "delete"}, "answer": "A"},
+      {"id": 43, "unit": "Unit 7", "unit_question_num": 13, "question": "My computer………… down yesterday. I have to buy a new one.", "options": {"A": "shut", "B": "turned", "C": "broke", "D": "fell"}, "answer": "C"},
+      {"id": 44, "unit": "Unit 7", "unit_question_num": 14, "question": "Press “SAVE” before you log…………", "options": {"A": "on", "B": "off", "C": "down", "D": "in"}, "answer": "B"},
+      {"id": 45, "unit": "Unit 7", "unit_question_num": 15, "question": "Where can I ………… in the printer?.", "options": {"A": "plug", "B": "scan", "C": "type", "D": "come"}, "answer": "A"},
+      {"id": 46, "unit": "Unit 7", "unit_question_num": 16, "question": "Please turn ………… the speakers a bit! They are very loud.", "options": {"A": "down", "B": "off", "C": "up", "D": "on"}, "answer": "A"},
+      {"id": 47, "unit": "Unit 7", "unit_question_num": 17, "question": "I never remember to back………… my homework.", "options": {"A": "in", "B": "down", "C": "up", "D": "to"}, "answer": "C"},
+      {"id": 48, "unit": "Unit 7", "unit_question_num": 18, "question": "He posts comments on that internet………… every day.", "options": {"A": "media", "B": "forum", "C": "account", "D": "access"}, "answer": "B"},
+      {"id": 49, "unit": "Unit 7", "unit_question_num": 19, "question": "She used a different password for her Twitter…………", "options": {"A": "forum", "B": "media", "C": "page", "D": "account"}, "answer": "D"},
+      {"id": 50, "unit": "Unit 7", "unit_question_num": 20, "question": "A story is ………… when almost everyone is talking about it.", "options": {"A": "fundraising", "B": "viral", "C": "hard", "D": "soft"}, "answer": "B"},
+      {"id": 51, "unit": "Unit 7", "unit_question_num": 21, "question": "The school set up a ………… page to get money for a new swimming pool.", "options": {"A": "fundraising", "B": "home", "C": "fan", "D": "private"}, "answer": "A"},
+      {"id": 52, "unit": "Unit 7", "unit_question_num": 22, "question": "Many people use social ………… to ask for and give advice.", "options": {"A": "life", "B": "skill", "C": "media", "D": "welfare"}, "answer": "C"},
+      {"id": 53, "unit": "Unit 7", "unit_question_num": 23, "question": "Back………… your work in case you lose your memory stick.", "options": {"A": "down", "B": "up", "C": "off", "D": "on"}, "answer": "B"},
+      {"id": 54, "unit": "Unit 7", "unit_question_num": 24, "question": "We have to ………… down all of the computers at the end of the day.", "options": {"A": "break", "B": "turn", "C": "shut", "D": "take"}, "answer": "C"},
+      {"id": 55, "unit": "Unit 7", "unit_question_num": 25, "question": "You………… in the wrong username.", "options": {"A": "plugged", "B": "scanned", "C": "typed", "D": "logged"}, "answer": "C"},
+      {"id": 56, "unit": "Unit 7", "unit_question_num": 26, "question": "I can’t hear anything. Please turn………… the volume.", "options": {"A": "up", "B": "off", "C": "down", "D": "on"}, "answer": "A"},
+      {"id": 57, "unit": "Unit 7", "unit_question_num": 27, "question": "You need a password to …………", "options": {"A": "log off", "B": "plug in", "C": "log on", "D": "shut down"}, "answer": "C"},
+      {"id": 58, "unit": "Unit 7", "unit_question_num": 28, "question": "More and more businesses use hashtag ………… to introduce new products.", "options": {"A": "account", "B": "media", "C": "forum", "D": "campaigns"}, "answer": "D"},
+      {"id": 59, "unit": "Unit 7", "unit_question_num": 29, "question": "She………… a famous writer in 1990.", "options": {"A": "becomes", "B": "become", "C": "became", "D": "becoming"}, "answer": "C"},
+      {"id": 60, "unit": "Unit 7", "unit_question_num": 30, "question": "He’s angry because you ………… his mobile phone.", "options": {"A": "broke", "B": "did", "C": "fell", "D": "made"}, "answer": "A"},
+      {"id": 61, "unit": "Unit 7", "unit_question_num": 31, "question": "I need a ………… for my mobile phone – the battery is really low.", "options": {"A": "keyboard", "B": "charger", "C": "tablet", "D": "webcam"}, "answer": "B"},
+      {"id": 62, "unit": "Unit 7", "unit_question_num": 32, "question": "Does this computer have ………… ? I want to listen to the pronunciation.", "options": {"A": "speakers", "B": "router", "C": "mouse", "D": "charger"}, "answer": "A"},
+      {"id": 63, "unit": "Unit 7", "unit_question_num": 33, "question": "I can’t find this Russian letter on my …………", "options": {"A": "mouse", "B": "keyboard", "C": "speakers", "D": "memory stick"}, "answer": "B"},
+      {"id": 64, "unit": "Unit 7", "unit_question_num": 34, "question": "You have to use the ………. in the library if you want colour documents.", "options": {"A": "mouse", "B": "printer", "C": "speakers", "D": "keyboard"}, "answer": "B"},
+      {"id": 65, "unit": "Unit 7", "unit_question_num": 35, "question": "Press “……….” if you don’t want to keep your work.", "options": {"A": "Scan", "B": "Print", "C": "Connect to", "D": "Delete"}, "answer": "D"},
+      {"id": 66, "unit": "Unit 7", "unit_question_num": 36, "question": "Click on the Wi-Fi icon to ………. the wireless network.", "options": {"A": "surf", "B": "upload", "C": "connect to", "D": "scan"}, "answer": "C"},
+      {"id": 67, "unit": "Unit 7", "unit_question_num": 37, "question": "You should ………. the internet to find the best language-learning websites for you.", "options": {"A": "scan", "B": "surf", "C": "connect to", "D": "download"}, "answer": "B"},
+      {"id": 68, "unit": "Unit 7", "unit_question_num": 38, "question": "He wants to ………. a video to the class Facebook page.", "options": {"A": "upload", "B": "delete", "C": "surf", "D": "scan"}, "answer": "A"},
+      {"id": 69, "unit": "Unit 7", "unit_question_num": 39, "question": "You can ……… your documents with the printer.", "options": {"A": "print", "B": "download", "C": "upload", "D": "delete"}, "answer": "A"},//  (32 questions)
+      {"id": 70, "unit": "Unit 8", "unit_question_num": 1, "question": "I ………. a beginner’s course in French next month.", "options": {"A": "starts", "B": "am going to start", "C": "is going to start", "D": "starting"}, "answer": "B"},
+      {"id": 71, "unit": "Unit 8", "unit_question_num": 2, "question": "Next year, my parents ………. a new house in the city.", "options": {"A": "is going to buy", "B": "bought", "C": "are going to buy", "D": "buy"}, "answer": "C"},
+      {"id": 72, "unit": "Unit 8", "unit_question_num": 3, "question": "Do you want to ………. cycling this weekend?", "options": {"A": "go", "B": "do", "C": "play", "D": "make"}, "answer": "A"},
+      {"id": 73, "unit": "Unit 8", "unit_question_num": 4, "question": "My mum ………. yoga every Monday.", "options": {"A": "do", "B": "did", "C": "does", "D": "is doing"}, "answer": "C"},
+      {"id": 74, "unit": "Unit 8", "unit_question_num": 5, "question": "The students ……… athletics at school last summer.", "options": {"A": "played", "B": "went", "C": "made", "D": "did"}, "answer": "D"},
+      {"id": 75, "unit": "Unit 8", "unit_question_num": 6, "question": "You perform with lots of different types of equipment in this sport.", "options": {"A": "tennis", "B": "gymnastics", "C": "basketball", "D": "judo"}, "answer": "B"},
+      {"id": 76, "unit": "Unit 8", "unit_question_num": 7, "question": "You can train for this sport on high walls.", "options": {"A": "climbing", "B": "swimming", "C": "handball", "D": "ice hockey"}, "answer": "A"},
+      {"id": 77, "unit": "Unit 8", "unit_question_num": 8, "question": "This is a sport in the winter Olympics.", "options": {"A": "ice skating", "B": "table tennis", "C": "tennis", "D": "aerobics"}, "answer": "A"},
+      {"id": 78, "unit": "Unit 8", "unit_question_num": 9, "question": "If you are good at this sport you wear a black belt.", "options": {"A": "karate", "B": "skiing", "C": "golf", "D": "badminton"}, "answer": "A"},
+      {"id": 79, "unit": "Unit 8", "unit_question_num": 10, "question": "You hit the ball with your hands in this sport.", "options": {"A": "badminton", "B": "volleyball", "C": "soccer", "D": "surfing"}, "answer": "B"},
+      {"id": 80, "unit": "Unit 8", "unit_question_num": 11, "question": "I’m going to go to the UK ………...", "options": {"A": "last year", "B": "next year", "C": "in the last few years", "D": "every year"}, "answer": "B"},
+      {"id": 81, "unit": "Unit 8", "unit_question_num": 12, "question": "We’re going to buy a new car ………. a few days.", "options": {"A": "on", "B": "at", "C": "in", "D": "about"}, "answer": "C"},
+      {"id": 82, "unit": "Unit 8", "unit_question_num": 13, "question": "Can you ……… handball?", "options": {"A": "do", "B": "make", "C": "go", "D": "play"}, "answer": "D"},
+      {"id": 83, "unit": "Unit 8", "unit_question_num": 14, "question": "He ………. gymnastics when he was young.", "options": {"A": "did", "B": "played", "C": "made", "D": "went"}, "answer": "A"},
+      {"id": 84, "unit": "Unit 8", "unit_question_num": 15, "question": "Do you want to ………. skateboarding in the park?", "options": {"A": "go", "B": "play", "C": "make", "D": "do"}, "answer": "A"},
+      {"id": 85, "unit": "Unit 8", "unit_question_num": 16, "question": "Two or four people can play this sport together.", "options": {"A": "judo", "B": "aerobics", "C": "table tennis", "D": "golf"}, "answer": "C"},
+      {"id": 86, "unit": "Unit 8", "unit_question_num": 17, "question": "You usually play this in big green spaces:", "options": {"A": "golf", "B": "volleyball", "C": "handball", "D": "basketball"}, "answer": "A"},
+      {"id": 87, "unit": "Unit 8", "unit_question_num": 18, "question": "This activity is very calm and helps you to relax:", "options": {"A": "yoga", "B": "skiing", "C": "surfing", "D": "karate"}, "answer": "A"},
+      {"id": 88, "unit": "Unit 8", "unit_question_num": 19, "question": "You do this activity on the sea:", "options": {"A": "surfing", "B": "tennis", "C": "badminton", "D": "roller skating"}, "answer": "A"},
+      {"id": 89, "unit": "Unit 8", "unit_question_num": 20, "question": "The teacher ……… your story about leaving your homework on the bus.", "options": {"A": "believe", "B": "won’t believe", "C": "is believing", "D": "don’t believe"}, "answer": "B"},
+      {"id": 90, "unit": "Unit 8", "unit_question_num": 21, "question": "Don’t worry about the barbecue – I’m sure it ……….", "options": {"A": "will rain", "B": "rains", "C": "won’t rain", "D": "rain"}, "answer": "C"},
+      {"id": 91, "unit": "Unit 8", "unit_question_num": 22, "question": "We don’t have ………. to leave school early.", "options": {"A": "information", "B": "permission", "C": "donation", "D": "conversation"}, "answer": "B"},
+      {"id": 92, "unit": "Unit 8", "unit_question_num": 23, "question": "There is ………. about the school play on the website.", "options": {"A": "treatment", "B": "information", "C": "explanation", "D": "suggestion"}, "answer": "B"},
+      {"id": 93, "unit": "Unit 8", "unit_question_num": 24, "question": "She’s looking for student ………. that is close to her university.", "options": {"A": "accommodation", "B": "achievement", "C": "discussion", "D": "argument"}, "answer": "A"},
+      {"id": 94, "unit": "Unit 8", "unit_question_num": 25, "question": "They had a bad ………. and didn’t talk all day.", "options": {"A": "darkness", "B": "advertisement", "C": "accommodation", "D": "argument"}, "answer": "D"},
+      {"id": 95, "unit": "Unit 8", "unit_question_num": 26, "question": "I could hear strange sounds in the ………. of the night.", "options": {"A": "darkness", "B": "rudeness", "C": "happiness", "D": "sadness"}, "answer": "A"},
+      {"id": 96, "unit": "Unit 8", "unit_question_num": 27, "question": "I don’t think I ………. tomorrow. I want to stay at home and prepare for my exam.", "options": {"A": "won’t go", "B": "will go", "C": "go", "D": "went"}, "answer": "B"},
+      {"id": 97, "unit": "Unit 8", "unit_question_num": 28, "question": "We complained about the ………. of the waiter.", "options": {"A": "advertisement", "B": "rudeness", "C": "permission", "D": "happiness"}, "answer": "B"},
+      {"id": 98, "unit": "Unit 8", "unit_question_num": 29, "question": "She gave a big ………. to her favourite charity.", "options": {"A": "organization", "B": "donation", "C": "information", "D": "treatment"}, "answer": "B"},
+      {"id": 99, "unit": "Unit 8", "unit_question_num": 30, "question": "I saw a really good smartphone in an ………. on TV last night.", "options": {"A": "argument", "B": "advertisement", "C": "information", "D": "suggestion"}, "answer": "B"},
+      {"id": 100, "unit": "Unit 8", "unit_question_num": 31, "question": "They’re having a loud ………. in the living room at the moment.", "options": {"A": "fitness", "B": "sadness", "C": "conversation", "D": "suggestion"}, "answer": "C"},
+      {"id": 101, "unit": "Unit 8", "unit_question_num": 32, "question": "He didn’t give us any ………. for why he was late.", "options": {"A": "description", "B": "explanation", "C": "arrangement", "D": "argument"}, "answer": "B"},//  (52 questions)
+      {"id": 102, "unit": "Unit 9", "unit_question_num": 1, "question": "He ………. to a different country for 4 months.", "options": {"A": "have move", "B": "have moved", "C": "has move", "D": "has moved"}, "answer": "D"},
+      {"id": 103, "unit": "Unit 9", "unit_question_num": 2, "question": "I have learnt English ………. 5 years.", "options": {"A": "for", "B": "since", "C": "last", "D": "few"}, "answer": "A"},
+      {"id": 104, "unit": "Unit 9", "unit_question_num": 3, "question": "My parents ……… in this city since 1997.", "options": {"A": "have lived", "B": "have moved", "C": "has lived", "D": "has moved"}, "answer": "A"},
+      {"id": 105, "unit": "Unit 9", "unit_question_num": 4, "question": "We ………. almost every lesson in this book so far.", "options": {"A": "studied", "B": "have studied", "C": "are studying", "D": "study"}, "answer": "B"},
+      {"id": 106, "unit": "Unit 9", "unit_question_num": 5, "question": "It’s my brother’s job to load the ………. after each meal.", "options": {"A": "dishwasher", "B": "washing machine", "C": "cooker", "D": "table"}, "answer": "A"},
+      {"id": 107, "unit": "Unit 9", "unit_question_num": 6, "question": "Put your old paper in the recycling …………, please.", "options": {"A": "bin", "B": "cupboard", "C": "stool", "D": "wardrobe"}, "answer": "A"},
+      {"id": 108, "unit": "Unit 9", "unit_question_num": 7, "question": "Look at your hair in the ……….!", "options": {"A": "mirror", "B": "blinds", "C": "carpet", "D": "light"}, "answer": "A"},
+      {"id": 109, "unit": "Unit 9", "unit_question_num": 8, "question": "I put my clothes in the ………. when I tidy my room.", "options": {"A": "bookcase", "B": "chest of drawers", "C": "washing machine", "D": "sink"}, "answer": "B"},
+      {"id": 110, "unit": "Unit 9", "unit_question_num": 9, "question": "Don’t walk on the ………… in those boots.", "options": {"A": "curtain", "B": "rug", "C": "bed", "D": "bath"}, "answer": "B"},
+      {"id": 111, "unit": "Unit 9", "unit_question_num": 10, "question": "Is your car in the ………., or did you park outside the house?", "options": {"A": "loft", "B": "basement", "C": "garden", "D": "garage"}, "answer": "D"},
+      {"id": 112, "unit": "Unit 9", "unit_question_num": 11, "question": "We need a new sofa for the ………… .", "options": {"A": "bedroom", "B": "bathroom", "C": "living room", "D": "kitchen"}, "answer": "C"},
+      {"id": 113, "unit": "Unit 9", "unit_question_num": 12, "question": "Please take off your shoes in the …………. before you go into any of the rooms", "options": {"A": "bedroom", "B": "hall", "C": "loft", "D": "study"}, "answer": "B"},
+      {"id": 114, "unit": "Unit 9", "unit_question_num": 13, "question": "What is he cooking in the …………?", "options": {"A": "kitchen", "B": "dining room", "C": "living room", "D": "garage"}, "answer": "A"},
+      {"id": 115, "unit": "Unit 9", "unit_question_num": 14, "question": "My sister spends half an hour in the ………… every morning.", "options": {"A": "bathroom", "B": "bedroom", "C": "loft", "D": "basement"}, "answer": "A"},
+      {"id": 116, "unit": "Unit 9", "unit_question_num": 15, "question": "…….you……..your bedroom yet?", "options": {"A": "Have-tidy", "B": "Has-tidied", "C": "Have-tidied", "D": "Has-tidy"}, "answer": "C"},
+      {"id": 117, "unit": "Unit 9", "unit_question_num": 16, "question": "Up to now, Mary …………. 5 books.", "options": {"A": "has already wrote", "B": "has written already", "C": "already has wrote", "D": "has already written"}, "answer": "D"},
+      {"id": 118, "unit": "Unit 9", "unit_question_num": 17, "question": "I love lying in the ………… after a long day at work.", "options": {"A": "sink", "B": "rug", "C": "bin", "D": "bath"}, "answer": "D"},
+      {"id": 119, "unit": "Unit 9", "unit_question_num": 18, "question": "Did you put my black socks in the ………… .", "options": {"A": "dishwasher", "B": "shower", "C": "desk", "D": "washing machine"}, "answer": "D"},
+      {"id": 120, "unit": "Unit 9", "unit_question_num": 19, "question": "Do you want the ………… up or down in the living room.", "options": {"A": "curtains", "B": "blinds", "C": "carpet", "D": "rug"}, "answer": "B"},
+      {"id": 121, "unit": "Unit 9", "unit_question_num": 20, "question": "Turn on this ………… next to the bed if you want to read.", "options": {"A": "clock", "B": "lamp", "C": "hi-fi", "D": "cooker"}, "answer": "B"},
+      {"id": 122, "unit": "Unit 9", "unit_question_num": 21, "question": "It’s a lovely long ……….. for four people.", "options": {"A": "sofa", "B": "stool", "C": "chair", "D": "desk"}, "answer": "A"},
+      {"id": 123, "unit": "Unit 9", "unit_question_num": 22, "question": "Do you spend a lot of time outside in the ………… in the summer.", "options": {"A": "garage", "B": "garden", "C": "utility room", "D": "hall"}, "answer": "B"},
+      {"id": 124, "unit": "Unit 9", "unit_question_num": 23, "question": "I think that I can hear your alarm clock in your ………… .", "options": {"A": "bedroom", "B": "bathroom", "C": "living room", "D": "loft"}, "answer": "A"},
+      {"id": 125, "unit": "Unit 9", "unit_question_num": 24, "question": "The ………… in our new house is too small for the fridge and the cooker.", "options": {"A": "utility room", "B": "kitchen", "C": "dining room", "D": "living room"}, "answer": "B"},
+      {"id": 126, "unit": "Unit 9", "unit_question_num": 25, "question": "This ………… is too small to invite so many people to dinner.", "options": {"A": "living room", "B": "study", "C": "basement", "D": "dining room"}, "answer": "D"},
+      {"id": 127, "unit": "Unit 9", "unit_question_num": 26, "question": "We’ve got two ………… . One in the bathroom upstairs and another one downstairs.", "options": {"A": "lofts", "B": "studies", "C": "kitchens", "D": "toilets"}, "answer": "D"},
+      {"id": 128, "unit": "Unit 9", "unit_question_num": 27, "question": "I …………. all of my money – I still have €20 left.", "options": {"A": "have spent", "B": "has spent", "C": "haven’t spent", "D": "hasn’t spent"}, "answer": "C"},
+      {"id": 129, "unit": "Unit 9", "unit_question_num": 28, "question": "You …………. a very good time today. You fell over and you lost your phone!", "options": {"A": "have had", "B": "haven’t had", "C": "has had", "D": "hasn’t had"}, "answer": "B"},
+      {"id": 130, "unit": "Unit 9", "unit_question_num": 29, "question": "The company …………. to my email yet. I wrote to them two weeks ago!", "options": {"A": "haven’t replied", "B": "have replied", "C": "hasn’t replied", "D": "has replied"}, "answer": "C"},
+      {"id": 131, "unit": "Unit 9", "unit_question_num": 30, "question": "He ………… her a big favour yesterday.", "options": {"A": "made", "B": "did", "C": "had", "D": "took"}, "answer": "B"},
+      {"id": 132, "unit": "Unit 9", "unit_question_num": 31, "question": "She’s ………… your advice to eat less sugar.", "options": {"A": "brought", "B": "taken", "C": "done", "D": "made"}, "answer": "B"},
+      {"id": 133, "unit": "Unit 9", "unit_question_num": 32, "question": "They are ………… a conversation in the kitchen.", "options": {"A": "having", "B": "doing", "C": "making", "D": "taking"}, "answer": "A"},
+      {"id": 134, "unit": "Unit 9", "unit_question_num": 33, "question": "The waiter hasn’t ………… us the menu yet.", "options": {"A": "taken", "B": "made", "C": "done", "D": "brought"}, "answer": "D"},
+      {"id": 135, "unit": "Unit 9", "unit_question_num": 34, "question": "You should ………… an appointment to see the doctor.", "options": {"A": "do", "B": "have", "C": "make", "D": "take"}, "answer": "C"},
+      {"id": 136, "unit": "Unit 9", "unit_question_num": 35, "question": "We’re just taking ………… supplies on the trek.", "options": {"A": "basic", "B": "free", "C": "tropical", "D": "sandy"}, "answer": "A"},
+      {"id": 137, "unit": "Unit 9", "unit_question_num": 36, "question": "I’m best friends with my ………… neighbour.", "options": {"A": "next-door", "B": "daily", "C": "free", "D": "basic"}, "answer": "A"},
+      {"id": 138, "unit": "Unit 9", "unit_question_num": 37, "question": "………… life in Alaska is completely different from Europe.", "options": {"A": "Free", "B": "Daily", "C": "Sandy", "D": "Next-door"}, "answer": "B"},
+      {"id": 139, "unit": "Unit 9", "unit_question_num": 38, "question": "The ocean is full of ………… fish.", "options": {"A": "tropical", "B": "free", "C": "sandy", "D": "basic"}, "answer": "A"},
+      {"id": 140, "unit": "Unit 9", "unit_question_num": 39, "question": "My mum is always busy – she never has any ………… time.", "options": {"A": "basic", "B": "sandy", "C": "free", "D": "tropical"}, "answer": "C"},
+      {"id": 141, "unit": "Unit 9", "unit_question_num": 40, "question": "We’re lucky with the weather! It ………… today.", "options": {"A": "has rained", "B": "hasn’t rained", "C": "haven’t rained", "D": "have rained"}, "answer": "B"},
+      {"id": 142, "unit": "Unit 9", "unit_question_num": 41, "question": "You ………… very friendly to the new boy. He’s upset now!", "options": {"A": "have been", "B": "has been", "C": "haven’t been", "D": "hasn’t been"}, "answer": "C"},
+      {"id": 143, "unit": "Unit 9", "unit_question_num": 42, "question": "She ………… us how to make fresh pasta yet.", "options": {"A": "hasn’t taught", "B": "has taught", "C": "has teach", "D": "hasn’t teach"}, "answer": "A"},
+      {"id": 144, "unit": "Unit 9", "unit_question_num": 43, "question": "She’s ………… a rest in her bedroom.", "options": {"A": "making", "B": "having", "C": "doing", "D": "taking"}, "answer": "D"},
+      {"id": 145, "unit": "Unit 9", "unit_question_num": 44, "question": "He finds it easier to ………… friends online.", "options": {"A": "make", "B": "have", "C": "do", "D": "take"}, "answer": "A"},
+      {"id": 146, "unit": "Unit 9", "unit_question_num": 45, "question": "I’m proud of my son because he always ………… his best.", "options": {"A": "does", "B": "makes", "C": "takes", "D": "has"}, "answer": "A"},
+      {"id": 147, "unit": "Unit 9", "unit_question_num": 46, "question": "The doctor told me to ………… this medicine every morning.", "options": {"A": "bring", "B": "make", "C": "do", "D": "take"}, "answer": "D"},
+      {"id": 148, "unit": "Unit 9", "unit_question_num": 47, "question": "Can you ………… me my glasses, please? I can’t see a thing!", "options": {"A": "take", "B": "do", "C": "bring", "D": "make"}, "answer": "C"},
+      {"id": 149, "unit": "Unit 9", "unit_question_num": 48, "question": "It isn’t a very ………… beach, so it isn’t great for sunbathing.", "options": {"A": "basic", "B": "sandy", "C": "free", "D": "tropical"}, "answer": "B"},
+      {"id": 150, "unit": "Unit 9", "unit_question_num": 49, "question": "I hope that our new ………… neighbours are quiet.", "options": {"A": "next-door", "B": "free", "C": "daily", "D": "basic"}, "answer": "A"},
+      {"id": 151, "unit": "Unit 9", "unit_question_num": 50, "question": "He spends all of his ………… time playing football.", "options": {"A": "free", "B": "basic", "C": "daily", "D": "sandy"}, "answer": "A"},
+      {"id": 152, "unit": "Unit 9", "unit_question_num": 51, "question": "They use a boat to take ………… supplies to the island.", "options": {"A": "basic", "B": "free", "C": "sandy", "D": "tropical"}, "answer": "A"},
+      {"id": 153, "unit": "Unit 9", "unit_question_num": 52, "question": "Let’s use ………… fruit, like pineapple or mango, in the salad.", "options": {"A": "free", "B": "tropical", "C": "daily", "D": "basic"}, "answer": "B"}
+    ];
+
+    // State management
+    let appState = {
+      shuffledQuestions: [],
+      userSelections: {}, // qId -> selected option index (0..3)
+      mode: 'practice',   // 'practice' or 'exam'
+      examSubmitted: false,
+      filter: 'all',
+      searchQuery: ''
+    };
+
+    let visibleCount = 20; // Lazy loading pagination
+    let currentFilteredQuestions = [];
+
+    // Local Storage keys
+    const STORAGE_KEY_SELECTIONS = 'ta2_user_selections';
+    const STORAGE_KEY_SHUFFLED = 'ta2_shuffled_questions';
+    const STORAGE_KEY_MODE = 'ta2_app_mode';
+    const STORAGE_KEY_EXAM_SUBMITTED = 'ta2_exam_submitted';
+
+    // Initialize application
+    function init() {
+      loadProgress();
+      
+      if (!appState.shuffledQuestions || !Array.isArray(appState.shuffledQuestions) || appState.shuffledQuestions.length !== ORIGINAL_QUESTIONS.length || !appState.shuffledQuestions[0]?.shuffledOptions) {
+        initShuffledQuestions();
+      }
+
+      applyFilterAndSearch();
+      renderNavigationGrid();
+      updateStats();
+      updateUIControls();
+    }
+
+    // Prepare shuffled options structure
+    function initShuffledQuestions() {
+      appState.shuffledQuestions = ORIGINAL_QUESTIONS.map(q => {
+        const optionsList = [
+          { key: 'A', text: q.options.A },
+          { key: 'B', text: q.options.B },
+          { key: 'C', text: q.options.C },
+          { key: 'D', text: q.options.D }
+        ];
+
+        return {
+          id: q.id,
+          unit: q.unit,
+          unit_question_num: q.unit_question_num,
+          question: q.question,
+          correctAnswerText: q.options[q.answer],
+          shuffledOptions: optionsList
+        };
+      });
+      saveProgress();
+    }
+
+    // Shuffle option order for all questions
+    function shuffleAnswersAll() {
+      if (confirm('Bạn có muốn xáo trộn ngẫu nhiên thứ tự các đáp án A, B, C, D của tất cả câu hỏi không?')) {
+        appState.shuffledQuestions.forEach(q => {
+          if (q.shuffledOptions) q.shuffledOptions.sort(() => Math.random() - 0.5);
+        });
+        saveProgress();
+        renderQuestionsList(false);
+        showToast('Đã tráo ngẫu nhiên đáp án tất cả câu hỏi!');
+      }
+    }
+
+    // Save state to localStorage
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY_SELECTIONS, JSON.stringify(appState.userSelections));
+      localStorage.setItem(STORAGE_KEY_SHUFFLED, JSON.stringify(appState.shuffledQuestions));
+      localStorage.setItem(STORAGE_KEY_MODE, appState.mode);
+      localStorage.setItem(STORAGE_KEY_EXAM_SUBMITTED, JSON.stringify(appState.examSubmitted));
+    }
+
+    // Load saved state
+    function loadProgress() {
+      try {
+        const savedSelections = localStorage.getItem(STORAGE_KEY_SELECTIONS);
+        const savedShuffled = localStorage.getItem(STORAGE_KEY_SHUFFLED);
+        const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
+        const savedSubmitted = localStorage.getItem(STORAGE_KEY_EXAM_SUBMITTED);
+
+        if (savedSelections) appState.userSelections = JSON.parse(savedSelections);
+        if (savedShuffled) appState.shuffledQuestions = JSON.parse(savedShuffled);
+        if (savedMode) appState.mode = savedMode;
+        if (savedSubmitted) appState.examSubmitted = JSON.parse(savedSubmitted);
+      } catch (e) {
+        console.error('Error loading progress from localStorage:', e);
+        appState.userSelections = {};
+        appState.shuffledQuestions = [];
+      }
+    }
+
+    // Reset progress
+    function resetProgressConfirm() {
+      if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử làm bài để ôn tập lại từ đầu không?')) {
+        appState.userSelections = {};
+        appState.examSubmitted = false;
+        saveProgress();
+        applyFilterAndSearch();
+        renderNavigationGrid();
+        updateStats();
+        updateUIControls();
+        showToast('Đã đặt lại tiến độ học tập!');
+      }
+    }
+
+    // Mode handling
+    function setMode(mode) {
+      if (appState.mode === mode) return;
+      appState.mode = mode;
+      saveProgress();
+      updateUIControls();
+      renderQuestionsList(false);
+      renderNavigationGrid();
+    }
+
+    function updateUIControls() {
+      document.getElementById('mode-practice').classList.toggle('active', appState.mode === 'practice');
+      document.getElementById('mode-exam').classList.toggle('active', appState.mode === 'exam');
+
+      const submitBtn = document.getElementById('submit-btn');
+      if (appState.mode === 'exam' && !appState.examSubmitted) {
+        submitBtn.style.display = 'flex';
+      } else {
+        submitBtn.style.display = 'none';
+      }
+    }
+
+    // Filter handling
+    function setFilter(filterType) {
+      appState.filter = filterType;
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filterType);
+      });
+      applyFilterAndSearch();
+    }
+
+    // Search handling
+    function handleSearch() {
+      appState.searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+      applyFilterAndSearch();
+    }
+
+    // Filter & Search Logic
+    function applyFilterAndSearch() {
+      currentFilteredQuestions = appState.shuffledQuestions.filter(q => {
+        // Unit filters
+        if (appState.filter === 'unit6' && q.unit !== 'Unit 6') return false;
+        if (appState.filter === 'unit7' && q.unit !== 'Unit 7') return false;
+        if (appState.filter === 'unit8' && q.unit !== 'Unit 8') return false;
+        if (appState.filter === 'unit9' && q.unit !== 'Unit 9') return false;
+
+        const isAnswered = appState.userSelections[q.id] !== undefined;
+        const status = getQuestionStatus(q.id);
+
+        if (appState.filter === 'undone' && isAnswered) return false;
+        if (appState.filter === 'done' && !isAnswered) return false;
+        if (appState.filter === 'correct' && status !== 'correct') return false;
+        if (appState.filter === 'incorrect' && status !== 'incorrect') return false;
+
+        // Search text matching
+        if (appState.searchQuery) {
+          const matchQ = q.question.toLowerCase().includes(appState.searchQuery);
+          const matchOpt = q.shuffledOptions.some(opt => opt.text.toLowerCase().includes(appState.searchQuery));
+          const matchUnit = q.unit.toLowerCase().includes(appState.searchQuery);
+          if (!matchQ && !matchOpt && !matchUnit) return false;
+        }
+
+        return true;
+      });
+
+      visibleCount = 20;
+      renderQuestionsList(false);
+    }
+
+    // Get question correctness status
+    function getQuestionStatus(qId) {
+      const selectedIdx = appState.userSelections[qId];
+      if (selectedIdx === undefined) return 'unanswered';
+      
+      const q = appState.shuffledQuestions.find(x => x.id === qId);
+      if (!q) return 'unanswered';
+
+      const chosenOption = q.shuffledOptions[selectedIdx];
+      if (chosenOption && chosenOption.text === q.correctAnswerText) {
+        return 'correct';
+      }
+      return 'incorrect';
+    }
+
+    // Handle user selection of an option
+    function selectOption(qId, optionIdx) {
+      const q = appState.shuffledQuestions.find(x => x.id === qId);
+      if (!q) return;
+
+      const isAnswered = appState.userSelections[qId] !== undefined;
+      
+      // In practice mode or after exam submission, don't allow changing answered questions
+      if (appState.mode === 'practice' && isAnswered) return;
+      if (appState.mode === 'exam' && appState.examSubmitted) return;
+
+      appState.userSelections[qId] = optionIdx;
+      saveProgress();
+
+      // Render updated card & stats
+      renderQuestionCard(qId);
+      updateGridItem(qId);
+      updateStats();
+
+      // In practice mode, if answer is wrong, shake card
+      if (appState.mode === 'practice') {
+        const status = getQuestionStatus(qId);
+        if (status === 'incorrect') {
+          const card = document.getElementById(`q-card-${qId}`);
+          if (card) {
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 400);
+          }
+        }
+      }
+    }
+
+    // Lazy load render questions list
+    function renderQuestionsList(appendOnly = false) {
+      const container = document.getElementById('questions-container');
+      
+      if (!appendOnly) {
+        container.innerHTML = '';
+      }
+
+      const toRender = currentFilteredQuestions.slice(
+        appendOnly ? container.children.length : 0,
+        visibleCount
+      );
+
+      toRender.forEach(q => {
+        if (document.getElementById(`q-card-${q.id}`)) return;
+
+        const card = document.createElement('div');
+        card.className = 'panel card';
+        card.id = `q-card-${q.id}`;
+        container.appendChild(card);
+        buildCardContent(card, q);
+      });
+
+      // Handle no results empty state
+      let noResults = document.getElementById('no-results-message');
+      if (currentFilteredQuestions.length === 0) {
+        if (!noResults) {
+          noResults = document.createElement('div');
+          noResults.id = 'no-results-message';
+          noResults.className = 'no-results panel';
+          noResults.innerHTML = `
+            <i class="fa-regular fa-folder-open"></i>
+            <p>Không tìm thấy câu hỏi nào phù hợp với bộ lọc hoặc từ khóa tìm kiếm.</p>
+          `;
+          container.appendChild(noResults);
+        } else {
+          noResults.style.display = 'block';
+        }
+      } else {
+        if (noResults) noResults.style.display = 'none';
+      }
+    }
+
+    // Infinite scroll load more
+    function loadMoreQuestions() {
+      if (visibleCount < currentFilteredQuestions.length) {
+        visibleCount = Math.min(visibleCount + 15, currentFilteredQuestions.length);
+        renderQuestionsList(true);
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 600) {
+        loadMoreQuestions();
+      }
+    });
+
+    // Render single question card content
+    function renderQuestionCard(qId) {
+      const card = document.getElementById(`q-card-${qId}`);
+      if (!card) return;
+      const q = appState.shuffledQuestions.find(x => x.id === qId);
+      if (!q) return;
+      buildCardContent(card, q);
+    }
+
+    function buildCardContent(card, q) {
+      const status = getQuestionStatus(q.id);
+      const isAnswered = appState.userSelections[q.id] !== undefined;
+      const showAnswers = (appState.mode === 'practice' && isAnswered) || (appState.mode === 'exam' && appState.examSubmitted);
+
+      let statusBadge = '';
+      if (showAnswers) {
+        if (status === 'correct') {
+          statusBadge = '<span class="q-status-badge correct"><i class="fa-solid fa-check"></i> Đúng</span>';
+        } else {
+          statusBadge = '<span class="q-status-badge incorrect"><i class="fa-solid fa-xmark"></i> Sai</span>';
+        }
+      } else if (isAnswered) {
+        statusBadge = '<span class="q-status-badge unanswered" style="color:#c084fc; border-color: rgba(124, 58, 237, 0.3); background: rgba(124, 58, 237, 0.05);"><i class="fa-solid fa-pen"></i> Đã chọn</span>';
+      } else {
+        statusBadge = '<span class="q-status-badge unanswered">Chưa trả lời</span>';
+      }
+
+      let optionsHtml = '';
+      const letters = ['A', 'B', 'C', 'D'];
+      const selectedIdx = appState.userSelections[q.id];
+
+      q.shuffledOptions.forEach((opt, idx) => {
+        const isSelected = selectedIdx === idx;
+        const isCorrectChoice = opt.text === q.correctAnswerText;
+        
+        let choiceClass = '';
+        if (isSelected) choiceClass += ' selected';
+        
+        if (showAnswers) {
+          if (isCorrectChoice) {
+            choiceClass += ' correct-choice';
+          } else if (isSelected && !isCorrectChoice) {
+            choiceClass += ' incorrect-choice';
+          }
+          choiceClass += ' disabled';
+        }
+
+        optionsHtml += `
+          <div class="option${choiceClass}" onclick="selectOption(${q.id}, ${idx})">
+            <div class="option-letter">${letters[idx]}</div>
+            <div class="option-text">${escapeHtml(opt.text)}</div>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div class="q-number">
+          <span>Câu ${q.id} <span class="unit-badge">${q.unit}</span></span>
+          ${statusBadge}
+        </div>
+        <div class="q-text">${escapeHtml(q.question)}</div>
+        <div class="options-grid">
+          ${optionsHtml}
+        </div>
+      `;
+    }
+
+    // Render 1-153 grid navigator
+    function renderNavigationGrid() {
+      const grid = document.getElementById('navigation-grid');
+      grid.innerHTML = '';
+
+      appState.shuffledQuestions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.id = `grid-btn-${q.id}`;
+        btn.className = 'grid-btn';
+        btn.textContent = q.id;
+        
+        updateGridItemClass(btn, q.id);
+
+        btn.onclick = () => {
+          document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const isFilteredOut = !currentFilteredQuestions.some(x => x.id === q.id);
+          if (isFilteredOut) {
+            setFilter('all');
+          }
+
+          const qIdx = currentFilteredQuestions.findIndex(x => x.id === q.id);
+          if (qIdx !== -1) {
+            if (qIdx >= visibleCount) {
+              visibleCount = qIdx + 1;
+              renderQuestionsList(true);
+            }
+
+            const card = document.getElementById(`q-card-${q.id}`);
+            if (card) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              card.style.borderColor = 'var(--primary)';
+              setTimeout(() => {
+                card.style.borderColor = 'var(--card-border)';
+              }, 1000);
+            }
+          }
+
+          if (window.innerWidth <= 1024) {
+            toggleMobilePanel();
+          }
+        };
+
+        grid.appendChild(btn);
+      });
+    }
+
+    function updateGridItem(qId) {
+      const btn = document.getElementById(`grid-btn-${qId}`);
+      if (btn) {
+        updateGridItemClass(btn, qId);
+      }
+    }
+
+    function updateGridItemClass(btn, qId) {
+      const status = getQuestionStatus(qId);
+      const isAnswered = appState.userSelections[qId] !== undefined;
+      const isExam = appState.mode === 'exam';
+
+      btn.classList.remove('correct', 'incorrect', 'answered');
+
+      if (isExam && !appState.examSubmitted) {
+        if (isAnswered) btn.classList.add('answered');
+      } else {
+        if (status === 'correct') btn.classList.add('correct');
+        else if (status === 'incorrect') btn.classList.add('incorrect');
+      }
+    }
+
+    // Update Statistics
+    function updateStats() {
+      const total = appState.shuffledQuestions.length;
+      let answeredCount = 0;
+      let correctCount = 0;
+      let incorrectCount = 0;
+
+      appState.shuffledQuestions.forEach(q => {
+        const isAnswered = appState.userSelections[q.id] !== undefined;
+        if (isAnswered) {
+          answeredCount++;
+          const status = getQuestionStatus(q.id);
+          if (status === 'correct') correctCount++;
+          else if (status === 'incorrect') incorrectCount++;
+        }
+      });
+
+      const unansweredCount = total - answeredCount;
+      const percentDone = total > 0 ? Math.round((answeredCount / total) * 100) : 0;
+      const scorePercent = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+      document.getElementById('stat-done').textContent = `${answeredCount}/${total}`;
+      document.getElementById('stat-score').textContent = `${scorePercent}%`;
+      document.getElementById('stat-correct').textContent = correctCount;
+      document.getElementById('stat-incorrect').textContent = incorrectCount;
+      
+      document.getElementById('percent-label').textContent = `${percentDone}%`;
+      document.getElementById('progress-bar').style.width = `${percentDone}%`;
+
+      document.getElementById('count-done').textContent = answeredCount;
+      document.getElementById('count-undone').textContent = unansweredCount;
+      document.getElementById('count-correct').textContent = correctCount;
+      document.getElementById('count-incorrect').textContent = incorrectCount;
+    }
+
+    // Submit Exam Mode
+    function submitExam() {
+      const answered = Object.keys(appState.userSelections).length;
+      const total = appState.shuffledQuestions.length;
+      
+      if (answered < total) {
+        if (!confirm(`Bạn mới làm ${answered}/${total} câu. Bạn có chắc muốn nộp bài chấm điểm ngay bây giờ không?`)) {
+          return;
+        }
+      } else {
+        if (!confirm('Bạn có chắc muốn nộp bài chấm điểm không?')) {
+          return;
+        }
+      }
+
+      appState.examSubmitted = true;
+      document.getElementById('submit-btn').style.display = 'none';
+
+      renderQuestionsList(false);
+      renderNavigationGrid();
+      updateStats();
+      saveProgress();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      let correct = 0;
+      appState.shuffledQuestions.forEach(q => {
+        if (getQuestionStatus(q.id) === 'correct') correct++;
+      });
+
+      const score10 = ((correct / total) * 10).toFixed(2);
+      alert(`KẾT QUẢ THI THỬ TIẾNG ANH 2:\nSố câu đúng: ${correct}/${total}\nĐiểm số: ${score10}/10 điểm.\nBạn có thể dò lại các câu sai màu đỏ để ôn tập.`);
+    }
+
+    // Mobile drawer trigger
+    function toggleMobilePanel() {
+      const panel = document.getElementById('right-panel');
+      panel.classList.toggle('show');
+    }
+
+    // Toast message helper
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
